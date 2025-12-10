@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.StudentsMapper">
+    <select id="page">
+        SELECT
+        s.id,
+        s.name,
+        s.no,
+        s.gender,
+        s.phone,
+        s.degree,
+        s.id_card idCard,
+        s.is_college isCollege,
+        s.address,
+        s.graduation_date graduationDate,
+        s.violation_count violationCount,
+        s.violation_score violationScore,
+        s.clazz_id clazzId,
+        s.create_time createTime,
+        s.update_time updateTime,
+        c.name clazzName
+        FROM
+        student s
+        INNER JOIN clazz c
+        on
+        s.clazz_id = c.id
+    </select>
+    <!-- 插入学生（包含所有字段，非必填字段用 if 判断是否传入） -->
+    <insert id="save" parameterType="com.itheima.pojo.Students">
+        INSERT INTO student (
+        name,
+        no,
+        gender,
+        phone,
+        degree,
+        clazz_id,
+        <!-- 非必填字段：存在值才插入 -->
+        <if test="idCard != null and idCard != ''">id_card,</if>
+        <if test="isCollege != null">is_college,</if>
+        <if test="address != null and address != ''">address,</if>
+        <if test="graduationDate != null and graduationDate != ''">graduation_date</if>
+        ) VALUES (
+        #{name},
+        #{no},
+        #{gender},
+        #{phone},
+        #{degree},
+        #{clazzId},
+
+        <if test="idCard != null and idCard != ''">#{idCard},</if>
+        <if test="isCollege != null">#{isCollege},</if>
+        <if test="address != null and address != ''">#{address},</if>
+        <if test="graduationDate != null and graduationDate != ''">#{graduationDate}</if>
+        )
+    </insert>
+    <update id="update" >
+            UPDATE student
+            <set>
+                <if test="name != null and name.trim() != ''">
+                    name = #{name},
+                </if>
+                <if test="no != null and no.trim() != ''">
+                    no = #{no},
+                </if>
+                <if test="phone != null and phone.trim() != ''">
+                    phone = #{phone},
+                </if>
+                <if test="gender != null">
+                    gender = #{gender},
+                </if>
+                <if test="degree != null">
+                    degree = #{degree},
+                </if>
+                <if test="violationCount != null">
+                    violation_count = #{violationCount},
+                </if>
+                <if test="violationScore != null">
+                    violation_score = #{violationScore},
+                </if>
+                <if test="clazzId != null">
+                    clazz_id = #{clazzId},
+                </if>
+                <if test="idCard != null and idCard.trim() != ''">
+                    id_card = #{idCard},
+                </if>
+                <if test="isCollege != null">
+                    is_college = #{isCollege},
+                </if>
+                <if test="address != null and address.trim() != ''">
+                    address = #{address},
+                </if>
+                <if test="graduationDate != null and graduationDate.trim() != ''">
+                    graduation_date = #{graduationDate},
+                </if>
+                update_time = #{updateTime}
+            </set>
+            WHERE id = #{id}
+    </update>
+    <select id="getStudentsDegreeData" resultType="map">
+        select
+        (case
+        when degree=1 then '初中'
+        when degree=2 then '高中'
+        when degree=3 then '大专'
+        when degree=4 then '本科'
+        when degree=5 then '硕士'
+        else  '博士' end) name,
+        count(*) value
+        from student
+        group by degree
+    </select>
+    <select id="getstudentCountData" resultType="map">
+        SELECT
+        clazz.name AS clazzName,
+        COUNT(student.clazz_id) AS studentCount
+        FROM
+        student
+        INNER JOIN clazz
+        ON student.clazz_id = clazz.id
+        GROUP BY
+        clazz.id, clazz.name
+        ORDER BY
+        clazz.name;
+    </select>
+</mapper>

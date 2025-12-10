@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.EmpMapper">
+    <select id="list" resultType="com.itheima.pojo.Emp">
+        select e.username,
+        e.password,
+        e.name,
+        e.gender,
+        e.phone,
+        e.job,
+        e.salary,
+        e.image,
+        e.entry_date entryDate,
+        e.dept_id deptId,
+        e.create_time createTime,
+        e.update_time updateTime,
+        d.name deptName from emp e left join dept d on e.dept_id = d.id
+        <where>
+            <if test="name != null and name != ''"> e.name like concat('%',#{name},'%') </if>
+            <if test="gender != null"> and e.gender = #{gender} </if>
+            <if test="begin != null and end != null"> and e.entry_date between #{begin} and #{end} </if>
+        </where>
+        order by e.update_time desc
+    </select>
+
+    <delete id="deleteInfo" >
+        delete from emp where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+              #{id}
+           </foreach>
+    </delete>
+
+    <delete id="deleteExpr">
+        delete from emp_expr where emp_id in
+        <foreach collection="empids" item="empid" separator="," open="(" close=")">
+            #{empid}
+        </foreach>
+    </delete>
+
+    <update id="updateEmp">
+        update emp
+        <set><!--该标签自动生成set关键字，并且可以自动删除更新字段后的多余-->
+        <if test="username != null and username.trim() != ''">
+            username = #{username},
+        </if>
+        <if test="password != null">
+            password = #{password},
+        </if>
+        <if test="name != null and name.trim() != ''">
+            name = #{name},
+        </if>
+        <if test="gender != null">
+            gender = #{gender},
+        </if>
+        <if test="phone != null and phone.trim() != ''">
+            phone = #{phone},
+        </if>
+        <if test="job != null">
+            job = #{job},
+        </if>
+        <if test="salary != null">
+            salary = #{salary},
+        </if>
+        <if test="image != null and image.trim() != ''">
+            image = #{image},
+        </if>
+        <if test="entryDate != null">
+            entry_date = #{entryDate},
+        </if>
+        <if test="deptId != null">
+            dept_id = #{deptId},
+        </if>
+        update_time = #{updateTime}
+
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getjobOption" resultType="java.util.Map">
+        select
+        ( case
+        when job=1 then '班主任'
+        when job=2 then '讲师'
+        when job=3 then '学工主管'
+        when job=4 then '教研主管'
+        when job=5 then '咨询师'
+        else '其他' end) pos,
+        count(*) num
+        from emp
+        group by job
+        order by num
+    </select>
+    <select id="getgenderOption" resultType="java.util.Map">
+        select
+        (case
+        when gender=2 then '女性员工'
+        else  '男性员工' end) name,
+        count(*) value
+        from emp
+        group by gender
+    </select>
+    <select id="EmpLogIn" resultType="com.itheima.pojo.LogInfoData">
+        select id,username,name from emp
+        where
+        username=#{username}
+        and
+        password=#{password}
+    </select>
+</mapper>

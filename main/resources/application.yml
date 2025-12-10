@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: tlias-web-management
+  # 数据源配置（核心）
+  datasource:
+    url: jdbc:mysql://localhost:3306/tliasweb
+    # 数据库用户名（安装 MySQL 时设置的账号，默认 root）
+    username: root
+    # 数据库密码（安装 MySQL 时设置的密码）
+    password: 123456
+    # 驱动类名（MySQL 8.0+ 固定为 com.mysql.cj.jdbc.Driver，无需修改）
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+# MyBatis 相关配置（若使用 MyBatis，需添加，否则可删除）
+mybatis:
+  configuration:
+    # 打印 SQL 日志（开发环境方便调试，生产环境建议关闭）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    logging:
+      level:
+        org.springframework.jdbc.support.JdbcTransactionManager: debug
